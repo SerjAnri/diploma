@@ -1,0 +1,22 @@
+summary: "Get K Folds division"
+description: "Returns random k fold division"
+produces:
+- "application/json"
+responses:
+  200:
+    description: "Success"
+    schema:
+      type: "array"
+      items:
+        type: "object"
+        properties:
+          trainFiles:
+            type: "array"
+            items:
+              type: "integer"
+          valFiles:
+            type: "array"
+            items:
+              type: "integer"
+          kFoldNumber:
+            type: "integer"
