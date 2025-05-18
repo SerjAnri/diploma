@@ -1,0 +1,12 @@
+summary: Get models results
+description: Returns models results as .pt file
+produces:
+  - multipart/form-data
+responses:
+  200:
+    description: Success
+    required: true
+    schema:
+      type: file
+  500:
+    description: Internal server error

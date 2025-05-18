@@ -1,0 +1,9 @@
+summary: Clean models results
+description: Deletes all .pt files in directory
+produces:
+  - application/json
+responses:
+  200:
+    description: Success
+  500:
+    description: Internal server error

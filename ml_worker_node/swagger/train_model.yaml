@@ -1,0 +1,27 @@
+summary: Train worker's models
+description: Training models on input images
+consumes:
+  - application/json
+produces:
+  - multipart/form-data
+parameters:
+  - name: KFoldDto
+    in: body
+    required: true
+    schema:
+      type: object
+      properties:
+        trainFiles:
+          type: array
+          items:
+            type: integer
+        kFoldNumber:
+          type: integer
+responses:
+  200:
+    description: Success
+    required: true
+    schema:
+      type: file
+  500:
+    description: Internal server error

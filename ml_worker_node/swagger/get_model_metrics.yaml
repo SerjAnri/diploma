@@ -1,0 +1,17 @@
+summary: Get model metrics
+description: Calculate accuracy of final model
+produces:
+  - application/json
+responses:
+  200:
+    description: Success
+    schema:
+      properties:
+        accuracy:
+          type: number
+        f1_macro:
+          type: number
+        top5acc:
+          type: number
+  500:
+    description: Internal server error

@@ -2,6 +2,12 @@ summary: "Get K Folds division"
 description: "Returns random k fold division"
 produces:
 - "application/json"
+parameters:
+- name: quantity
+  in: path
+  required: true
+  type: "integer"
+  description: "The path variable for quantity of KFolds"
 responses:
   200:
     description: "Success"
