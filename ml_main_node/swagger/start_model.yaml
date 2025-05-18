@@ -1,0 +1,11 @@
+summary: Start training process
+description: Start process of worker's training
+consumes:
+  - application/json
+produces:
+  - application/json
+responses:
+  200:
+    description: Success
+  500:
+    description: Internal server error
