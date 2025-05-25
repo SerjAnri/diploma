@@ -12,7 +12,7 @@ from torch.utils.data import DataLoader
 from torchvision.models import resnet18
 from DeviceDataLoader import DeviceDataLoader
 from accuracy import validate
-from models_averaging import models_avg_accumulate, ema_accumulate
+from models_averaging import models_avg_accumulate, ema_accumulate, fedavg_accumulate
 from swagger.swagger_config import swagger_config
 from threshold_model import prepare_threshold_model
 from flasgger import Swagger, swag_from
@@ -39,7 +39,7 @@ with app.app_context():
                             tv.transforms.RandomHorizontalFlip(),
                             tv.transforms.ToTensor(),
                             tv.transforms.Normalize(*stats, inplace=True)])
-    # val_ds = tv.datasets.CIFAR100(root=os.environ.get('EXTRACTED_DATASET_PATH'), train=False, download=False, transform=transform)
+
     val_ds = tv.datasets.CIFAR10(root=os.environ.get('EXTRACTED_DATASET_PATH'), train=False, download=False, transform=transform)
     val_loader = DataLoader(val_ds, batch_size=256, shuffle=False)
     models_dir = os.environ.get('MODELS_DIR')
@@ -58,6 +58,7 @@ with app.app_context():
 async def start_model():
     k = len(urls_for_training) + 1
     kfolds = requests.get(f'{os.environ.get('URL_FOR_KFOLD')}/{k}').json()
+    one_kfold_length = len(kfolds[0]['trainingFiles'])
     print(f'Kfolds len: {len(kfolds)}')
     kfolds_matrix = []
     for i in range(0, 2):
@@ -81,10 +82,8 @@ async def start_model():
             temp.load_state_dict(torch.load(model, weights_only=False))
             income_models.append(temp)
         if fold != k - 1:
-            ema_accumulate(folds_models=income_models)
+            fedavg_accumulate(income_models, one_kfold_length, len(val_ds.data))
             torch.save(income_models[0].state_dict(), f'{models_dir}\\common_model.pt')
-            # models_avg_accumulate(common_model, income_models)
-            # torch.save(common_model.state_dict(), 'common_model.pt')
             await fetch_all_updating(urls_for_updating, f'{os.environ.get('MODELS_DIR')}\\common_model.pt')
             print(f'Finished global step: {fold}')
         else:

@@ -18,3 +18,10 @@ def ema_accumulate(folds_models: List[torch.nn.Module], decay: float = 0.999):
         for fold_model in folds_models[1:]:
             temp_dict = dict(fold_model.named_parameters())
             param.data.mul_(decay).add_(temp_dict[name].data, alpha=1 - decay)
+
+def fedavg_accumulate(folds_models: List[torch.nn.Module], fold_size, total_size):
+    init_model = folds_models[0]
+    for name, param in init_model.named_parameters():
+        for fold_model in folds_models[1:]:
+            temp_dict = dict(fold_model.named_parameters())
+            param.data.mul_(fold_size / total_size).add_(temp_dict[name].data, alpha=fold_size / total_size)
