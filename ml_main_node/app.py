@@ -20,8 +20,6 @@ from flasgger import Swagger, swag_from
 app = Flask(__name__)
 swagger = Swagger(app, config=swagger_config)
 
-request_mapping = Blueprint('main', __name__, url_prefix='/api/v1')
-
 with app.app_context():
     torch.set_default_device('cpu')
     torch.cuda.empty_cache()
@@ -53,8 +51,7 @@ with app.app_context():
     common_model.fc = nn.Linear(512, 10)
     common_model = common_model.to(device)
 
-@request_mapping.route('/start_model', methods=['GET'])
-@app.route('/start_model', methods=['GET'])
+@app.route('/api/v1/start_model', methods=['GET'])
 async def start_model():
     k = len(urls_for_training)
     kfolds = requests.get(f'{os.environ.get('URL_FOR_KFOLD')}/{k}').json()
@@ -150,6 +147,5 @@ async def clean_models(urls):
         return await asyncio.gather(*tasks)
 
 
-app.register_blueprint(request_mapping)
 if __name__ == '__main__':
     app.run()
