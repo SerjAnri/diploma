@@ -54,11 +54,11 @@ with app.app_context():
     common_model = common_model.to(device)
 
 @request_mapping.route('/start_model', methods=['GET'])
-@swag_from('./swagger/start_model.yaml')
+@app.route('/start_model', methods=['GET'])
 async def start_model():
-    k = len(urls_for_training) + 1
+    k = len(urls_for_training)
     kfolds = requests.get(f'{os.environ.get('URL_FOR_KFOLD')}/{k}').json()
-    one_kfold_length = len(kfolds[0]['trainingFiles'])
+    one_kfold_length = len(kfolds[0]['trainFiles'])
     print(f'Kfolds len: {len(kfolds)}')
     kfolds_matrix = []
     for i in range(0, 2):
@@ -79,7 +79,7 @@ async def start_model():
             temp = resnet18()
             temp.fc = nn.Linear(512, 10)
             temp = temp.to(device)
-            temp.load_state_dict(torch.load(model, weights_only=False))
+            temp.load_state_dict(torch.load(model, weights_only=False, map_location=torch.device('cpu')))
             income_models.append(temp)
         if fold != k - 1:
             fedavg_accumulate(income_models, one_kfold_length, len(val_ds.data))
